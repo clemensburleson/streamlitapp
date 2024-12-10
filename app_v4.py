@@ -244,6 +244,10 @@ with tab3:
     
     df = load_data()
     
+    # Calculate default values for Depth and Table
+    default_depth = df["Depth"].mean()
+    default_table = df["Table"].mean()
+    
     # Prediction Section
     st.subheader("Make Predictions")
     with st.form("prediction_form"):
@@ -251,8 +255,6 @@ with tab3:
         Cut = st.selectbox("Cut", options=df["Cut"].unique())
         Color = st.selectbox("Color", options=df["Color"].unique())
         Clarity = st.selectbox("Clarity", options=df["Clarity"].unique())
-        Depth = st.slider("Depth", min_value=float(df["Depth"].min()), max_value=float(df["Depth"].max()), value=float(df["Depth"].mean()))
-        Table = st.slider("Table", min_value=float(df["Table"].min()), max_value=float(df["Table"].max()), value=float(df["Table"].mean()))
         submitted = st.form_submit_button("Predict Price")
     
     if submitted:
@@ -262,16 +264,11 @@ with tab3:
             'Cut': [Cut],
             'Color': [Color],
             'Clarity': [Clarity],
-            'Depth': [Depth],
-            'Table': [Table]
+            'Depth': [default_depth],  # Add default depth
+            'Table': [default_table]   # Add default table
         })
     
         # Ensure input matches training feature set
-        for col in FEATURE_COLUMNS:
-            if col not in input_data.columns:
-                input_data[col] = 0  # Fill missing features with 0
-    
-        # Ensure column order matches training data
         input_data = input_data[FEATURE_COLUMNS]
     
         # Predict using the pre-trained and tuned models
@@ -289,6 +286,7 @@ with tab3:
             """, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error making predictions: {e}")
+
 
 
 
