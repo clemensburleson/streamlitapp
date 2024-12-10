@@ -315,7 +315,7 @@ with tab3:
 
 
 with tab4:
-    st.header("Pricing Relationships")
+    st.header("Statistical Visualization")
     import seaborn as sns
     import matplotlib.pyplot as plt
 
