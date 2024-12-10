@@ -209,9 +209,6 @@ from sklearn.ensemble import GradientBoostingRegressor
 with tab3:
     import streamlit as st
     import pandas as pd
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    import joblib
     from catboost import CatBoostRegressor
     
     st.header("Diamond Price Prediction Tool")
@@ -220,13 +217,10 @@ with tab3:
         "You can compare predictions from a pre-tuned and a tuned model."
     )
     
-    @st.cache_data()
-    def load_data():
-        # Load the dataset
-        df = pd.read_csv("diamonds.csv")
-        df.columns = df.columns.str.capitalize()
-        return df.dropna()
+    # Define feature list explicitly
+    FEATURE_COLUMNS = ['Carat', 'Cut', 'Color', 'Clarity', 'Depth', 'Table']
     
+    # Load pre-trained models
     @st.cache_resource
     def load_models():
         try:
@@ -239,9 +233,16 @@ with tab3:
             st.error("Model files not found. Ensure 'pre_tuned_catboost_model.cbm' and 'tuned_catboost_model.cbm' exist.")
             st.stop()
     
-    # Load data and models
-    df = load_data()
     pre_tuned_model, tuned_model = load_models()
+    
+    # Load dataset
+    @st.cache_data()
+    def load_data():
+        df = pd.read_csv("diamonds.csv")
+        df.columns = df.columns.str.capitalize()
+        return df.dropna()
+    
+    df = load_data()
     
     # Prediction Section
     st.subheader("Make Predictions")
@@ -250,6 +251,8 @@ with tab3:
         Cut = st.selectbox("Cut", options=df["Cut"].unique())
         Color = st.selectbox("Color", options=df["Color"].unique())
         Clarity = st.selectbox("Clarity", options=df["Clarity"].unique())
+        Depth = st.slider("Depth", min_value=float(df["Depth"].min()), max_value=float(df["Depth"].max()), value=float(df["Depth"].mean()))
+        Table = st.slider("Table", min_value=float(df["Table"].min()), max_value=float(df["Table"].max()), value=float(df["Table"].mean()))
         submitted = st.form_submit_button("Predict Price")
     
     if submitted:
@@ -258,8 +261,18 @@ with tab3:
             'Carat': [Carat],
             'Cut': [Cut],
             'Color': [Color],
-            'Clarity': [Clarity]
+            'Clarity': [Clarity],
+            'Depth': [Depth],
+            'Table': [Table]
         })
+    
+        # Ensure input matches training feature set
+        for col in FEATURE_COLUMNS:
+            if col not in input_data.columns:
+                input_data[col] = 0  # Fill missing features with 0
+    
+        # Ensure column order matches training data
+        input_data = input_data[FEATURE_COLUMNS]
     
         # Predict using the pre-trained and tuned models
         try:
@@ -276,6 +289,7 @@ with tab3:
             """, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error making predictions: {e}")
+
 
 
 with tab4:
