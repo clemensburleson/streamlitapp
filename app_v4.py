@@ -204,13 +204,6 @@ with tab2:
                 unsafe_allow_html=True
             )
 
-
-# Use the model for predictions
-with tab3:
-    st.header("Price Prediction Tool")
-    
-        )
-
 with tab4:
     st.header("Pricing Relationships")
     if 'filtered_diamonds' in locals() and not filtered_diamonds.empty:
