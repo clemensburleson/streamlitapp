@@ -336,22 +336,6 @@ with tab4:
     ax2.set_ylabel('Price ($)', fontsize=12)
     st.pyplot(fig2)  # Use st.pyplot to display the figure in Streamlit
 
-    # Box Plot: Price vs Cut
-    fig3, ax3 = plt.subplots(figsize=(10, 6))
-    sns.boxplot(data=df, x='Cut', y='Price', ax=ax3, palette='Blues')
-    ax3.set_title('Box Plot of Price by Cut', fontsize=16)
-    ax3.set_xlabel('Cut', fontsize=12)
-    ax3.set_ylabel('Price ($)', fontsize=12)
-    st.pyplot(fig3)
-
-    # Violin Plot: Price vs Carat
-    fig4, ax4 = plt.subplots(figsize=(10, 6))
-    sns.violinplot(data=df, x='Carat', y='Price', ax=ax4, scale='width', palette='coolwarm')
-    ax4.set_title('Violin Plot of Price by Carat', fontsize=16)
-    ax4.set_xlabel('Carat', fontsize=12)
-    ax4.set_ylabel('Price ($)', fontsize=12)
-    st.pyplot(fig4)
-
     # Pair Plot of Numeric Features
     fig5 = sns.pairplot(df, vars=['Price', 'Carat', 'Depth', 'Table'], diag_kind='kde', corner=True, palette='viridis')
     fig5.fig.suptitle('Pair Plot of Numeric Features', y=1.02, fontsize=16)
