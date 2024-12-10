@@ -377,7 +377,7 @@ with tab3:
 
 with tab4:
     st.header("Pricing Relationships")
-        import seaborn as sns
+    import seaborn as sns
     import matplotlib.pyplot as plt
     
     # Distribution plot for Price
