@@ -327,22 +327,23 @@ with tab4:
     st.header("Pricing Relationships")
     import seaborn as sns
     import matplotlib.pyplot as plt
-    
+
     # Distribution plot for Price
-    plt.figure(figsize=(10, 6))
-    sns.histplot(df['Price'], bins=50, kde=True, color='blue')
-    plt.title('Distribution of Diamond Prices', fontsize=16)
-    plt.xlabel('Price ($)', fontsize=12)
-    plt.ylabel('Frequency', fontsize=12)
-    plt.show()
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+    sns.histplot(df['Price'], bins=50, kde=True, color='blue', ax=ax1)
+    ax1.set_title('Distribution of Diamond Prices', fontsize=16)
+    ax1.set_xlabel('Price ($)', fontsize=12)
+    ax1.set_ylabel('Frequency', fontsize=12)
+    st.pyplot(fig1)  # Use st.pyplot to display the figure in Streamlit
 
     # Hexbin plot: Price vs Carat
-    plt.figure(figsize=(10, 6))
-    plt.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)
-    plt.colorbar(label='Count')
-    plt.title('Hexbin Plot of Price vs Carat', fontsize=16)
-    plt.xlabel('Carat', fontsize=12)
-    plt.ylabel('Price ($)', fontsize=12)
-    plt.show()
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    hb = ax2.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)
+    cb = plt.colorbar(hb, ax=ax2, label='Count')
+    ax2.set_title('Hexbin Plot of Price vs Carat', fontsize=16)
+    ax2.set_xlabel('Carat', fontsize=12)
+    ax2.set_ylabel('Price ($)', fontsize=12)
+    st.pyplot(fig2)  # Use st.pyplot to display the figure in Streamlit
+
 
 
