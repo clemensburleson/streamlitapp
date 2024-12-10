@@ -212,7 +212,36 @@ with tab3:
         "This section trains and evaluates a Gradient Boosting model on the diamond dataset. "
         "You can compare the performance of pre-tuned and tuned models and predict diamond prices."
     )
-
+        # Prepare data
+    X = df.drop(columns=['Price'], errors='ignore')  # Exclude 'Price' as it's the target
+    y = df['Price']  # Target variable
+    
+    # Handle missing values
+    X = X.fillna(0)
+    y = y.fillna(0)
+    
+    # Validate that data is not empty
+    if X.empty or y.empty:
+        st.error("The dataset is empty after processing. Please check your data source.")
+        st.stop()
+    
+    # Validate row count consistency
+    if X.shape[0] != y.shape[0]:
+        st.error(f"Feature matrix (X) and target vector (y) have mismatched rows: {X.shape[0]} vs {y.shape[0]}.")
+        st.stop()
+    
+    # Encode categorical features
+    categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+    for col in categorical_features:
+        X[col] = X[col].astype('category').cat.codes
+    
+    # Train/test split
+    try:
+        from sklearn.model_selection import train_test_split
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    except Exception as e:
+        st.error(f"Error during train/test split: {e}")
+        st.stop()
     # Ensure dataset (`df`) is loaded and validate required columns
     required_columns = ['Carat', 'Cut', 'Color', 'Clarity', 'Price']
     if not all(col in df.columns for col in required_columns):
