@@ -218,7 +218,7 @@ with tab3:
     )
     
     # Define feature list explicitly
-    FEATURE_COLUMNS = ['Carat', 'Cut', 'Color', 'Clarity', 'Depth', 'Table']
+    FEATURE_COLUMNS = ['Carat', 'Cut', 'Color', 'Clarity', 'Depth', 'Table', 'X', 'Y', 'Z']
     
     # Load pre-trained models
     @st.cache_resource
@@ -244,9 +244,12 @@ with tab3:
     
     df = load_data()
     
-    # Calculate default values for Depth and Table
+    # Calculate default values for Depth, Table, X, Y, Z
     default_depth = df["Depth"].mean()
     default_table = df["Table"].mean()
+    default_x = df["X"].mean()
+    default_y = df["Y"].mean()
+    default_z = df["Z"].mean()
     
     # Prediction Section
     st.subheader("Make Predictions")
@@ -265,7 +268,10 @@ with tab3:
             'Color': [Color],
             'Clarity': [Clarity],
             'Depth': [default_depth],  # Add default depth
-            'Table': [default_table]   # Add default table
+            'Table': [default_table],  # Add default table
+            'X': [default_x],          # Add default X
+            'Y': [default_y],          # Add default Y
+            'Z': [default_z]           # Add default Z
         })
     
         # Ensure input matches training feature set
@@ -286,8 +292,6 @@ with tab3:
             """, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error making predictions: {e}")
-
-
 
 
 with tab4:
