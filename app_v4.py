@@ -210,6 +210,7 @@ with tab3:
     import streamlit as st
     import pandas as pd
     from catboost import CatBoostRegressor
+    import numpy as np
     from sklearn.metrics import mean_squared_error, r2_score
     
     st.header("Diamond Price Prediction Tool")
@@ -301,7 +302,7 @@ with tab3:
     
         # Evaluate pre-tuned model
         pre_tuned_predictions = pre_tuned_model.predict(X)
-        pre_rmse = mean_squared_error(y, pre_tuned_predictions, squared=False)
+        pre_rmse = np.sqrt(mean_squared_error(y, pre_tuned_predictions))
         pre_r2 = r2_score(y, pre_tuned_predictions)
     
         # Evaluate tuned model
