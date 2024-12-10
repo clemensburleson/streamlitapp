@@ -203,6 +203,8 @@ with tab2:
                 """,
                 unsafe_allow_html=True
             )
+            
+from sklearn.ensemble import GradientBoostingRegressor
 
 with tab3:
     st.header("Diamond Price Prediction Tool")
