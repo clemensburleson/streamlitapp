@@ -319,22 +319,38 @@ with tab4:
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    # Distribution plot for Price
+    # Distribution of Carat
     fig1, ax1 = plt.subplots(figsize=(10, 6))
-    sns.histplot(df['Price'], bins=50, kde=True, color='#739BD0', ax=ax1)
-    ax1.set_title('Distribution of Diamond Prices', fontsize=16)
-    ax1.set_xlabel('Price ($)', fontsize=12)
+    sns.histplot(df['Carat'], bins=50, kde=True, color='#739BD0', ax=ax1)
+    ax1.set_title('Distribution of Carat', fontsize=16)
+    ax1.set_xlabel('Carat', fontsize=12)
     ax1.set_ylabel('Frequency', fontsize=12)
     st.pyplot(fig1)
     
-    # Distribution plot for Carat
+    # Distribution of Cut
     fig2, ax2 = plt.subplots(figsize=(10, 6))
-    sns.histplot(df['Carat'], bins=50, kde=True, color='#739BD0', ax=ax2)
-    ax2.set_title('Distribution of Carats', fontsize=16)
-    ax2.set_xlabel('Carat', fontsize=12)
+    sns.countplot(data=df, x='Cut', palette=['#739BD0'], ax=ax2)
+    ax2.set_title('Distribution of Cut', fontsize=16)
+    ax2.set_xlabel('Cut', fontsize=12)
     ax2.set_ylabel('Frequency', fontsize=12)
     st.pyplot(fig2)
     
+    # Distribution of Color
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
+    sns.countplot(data=df, x='Color', palette=['#739BD0'], ax=ax3)
+    ax3.set_title('Distribution of Color', fontsize=16)
+    ax3.set_xlabel('Color', fontsize=12)
+    ax3.set_ylabel('Frequency', fontsize=12)
+    st.pyplot(fig3)
+    
+    # Distribution of Clarity
+    fig4, ax4 = plt.subplots(figsize=(10, 6))
+    sns.countplot(data=df, x='Clarity', palette=['#739BD0'], ax=ax4)
+    ax4.set_title('Distribution of Clarity', fontsize=16)
+    ax4.set_xlabel('Clarity', fontsize=12)
+    ax4.set_ylabel('Frequency', fontsize=12)
+    st.pyplot(fig4)
+
     # Hexbin plot: Price vs Carat
     fig3, ax3 = plt.subplots(figsize=(10, 6))
     hb = ax3.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
@@ -343,13 +359,3 @@ with tab4:
     ax3.set_xlabel('Carat', fontsize=12)
     ax3.set_ylabel('Price ($)', fontsize=12)
     st.pyplot(fig3)
-    
-    # Facet Grid: Price Distribution by Color
-    facet = sns.FacetGrid(df, col='Color', col_wrap=4, height=4, aspect=1, palette={'Price': '#739BD0'})
-    facet.map(sns.histplot, 'Price', kde=True, bins=30, color='#739BD0')
-    facet.fig.subplots_adjust(top=0.9)
-    facet.fig.suptitle('Price Distribution by Color', fontsize=16)
-    st.pyplot(facet.fig)
-
-
-
