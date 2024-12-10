@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Dec 10 08:53:49 2024
-
-@author: clemensburleson
-"""
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -38,17 +30,18 @@ st.markdown(
 # Banner section
 st.markdown(
     """
-    <h1 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">💎 Welcome to Diamond Brothers 💎</h1>
-    <h3 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">The world's best diamond pricing tool for transparency and confidence</h3>
+    <h1 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">💎 Diamond Brothers 💎</h1>
+    <h3 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">The world's best diamond pricing tool for (cat)boosting transparency and confidence!</h3>
     """,
     unsafe_allow_html=True
 )
 
 # Sidebar welcome message
-st.sidebar.header("Welcome!")
+st.sidebar.header("Welcome to the home of Diamond pricing!")
 st.sidebar.write("""
-This Diamond Brothers app uses advanced machine learning techniques to predict diamond prices based on attributes such as carat, cut, clarity, and color. 
-Customize your preferences, and view the filtered data, to make informed pricing decisions!
+This Diamond Brothers app gives you a clear concise and digestible overview of diamond pricing mechanics! 
+The app uses a CatBoost model to predict the price of any diamond based on: Carat, Color, Cut, and Clarity. 
+Have fun and keep on learning!
 """)
 
 st.markdown("By Clemens Burleson & Aksh Iyer from the University of St. Gallen under the instruction of Prof. Dr. Ivo Blohm")
