@@ -307,7 +307,7 @@ with tab3:
     
         # Evaluate tuned model
         tuned_predictions = tuned_model.predict(X)
-        tuned_rmse = mean_squared_error(y, tuned_predictions, squared=False)
+        tuned_rmse = np.sqrt(mean_squared_error(y, tuned_predictions))
         tuned_r2 = r2_score(y, tuned_predictions)
     
         # Display metrics
