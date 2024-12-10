@@ -324,7 +324,7 @@ with tab4:
     
     with col1:
         # Distribution of Carat
-        fig1, ax1 = plt.subplots(figsize=(6, 4))
+        fig1, ax1 = plt.subplots(figsize=(5, 3))
         sns.histplot(df['Carat'], bins=50, kde=True, color='#739BD0', ax=ax1)
         ax1.set_title('Distribution of Carat', fontsize=14)
         ax1.set_xlabel('Carat', fontsize=12)
@@ -333,7 +333,7 @@ with tab4:
     
     with col2:
         # Distribution of Cut
-        fig2, ax2 = plt.subplots(figsize=(6, 4))
+        fig2, ax2 = plt.subplots(figsize=(5, 3))
         sns.countplot(data=df, x='Cut', palette=['#739BD0'], ax=ax2)
         ax2.set_title('Distribution of Cut', fontsize=14)
         ax2.set_xlabel('Cut', fontsize=12)
@@ -345,7 +345,7 @@ with tab4:
     
     with col3:
         # Distribution of Color
-        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        fig3, ax3 = plt.subplots(figsize=(5, 3))
         sns.countplot(data=df, x='Color', palette=['#739BD0'], ax=ax3)
         ax3.set_title('Distribution of Color', fontsize=14)
         ax3.set_xlabel('Color', fontsize=12)
@@ -354,7 +354,7 @@ with tab4:
     
     with col4:
         # Distribution of Clarity
-        fig4, ax4 = plt.subplots(figsize=(6, 4))
+        fig4, ax4 = plt.subplots(figsize=(5, 3))
         sns.countplot(data=df, x='Clarity', palette=['#739BD0'], ax=ax4)
         ax4.set_title('Distribution of Clarity', fontsize=14)
         ax4.set_xlabel('Clarity', fontsize=12)
