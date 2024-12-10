@@ -319,37 +319,47 @@ with tab4:
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    # Distribution of Carat
-    fig1, ax1 = plt.subplots(figsize=(10, 6))
-    sns.histplot(df['Carat'], bins=50, kde=True, color='#739BD0', ax=ax1)
-    ax1.set_title('Distribution of Carat', fontsize=16)
-    ax1.set_xlabel('Carat', fontsize=12)
-    ax1.set_ylabel('Frequency', fontsize=12)
-    st.pyplot(fig1)
+    # Carat and Cut Distributions (Side by Side)
+    col1, col2 = st.columns(2)
     
-    # Distribution of Cut
-    fig2, ax2 = plt.subplots(figsize=(10, 6))
-    sns.countplot(data=df, x='Cut', palette=['#739BD0'], ax=ax2)
-    ax2.set_title('Distribution of Cut', fontsize=16)
-    ax2.set_xlabel('Cut', fontsize=12)
-    ax2.set_ylabel('Frequency', fontsize=12)
-    st.pyplot(fig2)
+    with col1:
+        # Distribution of Carat
+        fig1, ax1 = plt.subplots(figsize=(6, 4))
+        sns.histplot(df['Carat'], bins=50, kde=True, color='#739BD0', ax=ax1)
+        ax1.set_title('Distribution of Carat', fontsize=14)
+        ax1.set_xlabel('Carat', fontsize=12)
+        ax1.set_ylabel('Frequency', fontsize=12)
+        st.pyplot(fig1)
     
-    # Distribution of Color
-    fig3, ax3 = plt.subplots(figsize=(10, 6))
-    sns.countplot(data=df, x='Color', palette=['#739BD0'], ax=ax3)
-    ax3.set_title('Distribution of Color', fontsize=16)
-    ax3.set_xlabel('Color', fontsize=12)
-    ax3.set_ylabel('Frequency', fontsize=12)
-    st.pyplot(fig3)
+    with col2:
+        # Distribution of Cut
+        fig2, ax2 = plt.subplots(figsize=(6, 4))
+        sns.countplot(data=df, x='Cut', palette=['#739BD0'], ax=ax2)
+        ax2.set_title('Distribution of Cut', fontsize=14)
+        ax2.set_xlabel('Cut', fontsize=12)
+        ax2.set_ylabel('Frequency', fontsize=12)
+        st.pyplot(fig2)
     
-    # Distribution of Clarity
-    fig4, ax4 = plt.subplots(figsize=(10, 6))
-    sns.countplot(data=df, x='Clarity', palette=['#739BD0'], ax=ax4)
-    ax4.set_title('Distribution of Clarity', fontsize=16)
-    ax4.set_xlabel('Clarity', fontsize=12)
-    ax4.set_ylabel('Frequency', fontsize=12)
-    st.pyplot(fig4)
+    # Color and Clarity Distributions (Side by Side)
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        # Distribution of Color
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        sns.countplot(data=df, x='Color', palette=['#739BD0'], ax=ax3)
+        ax3.set_title('Distribution of Color', fontsize=14)
+        ax3.set_xlabel('Color', fontsize=12)
+        ax3.set_ylabel('Frequency', fontsize=12)
+        st.pyplot(fig3)
+    
+    with col4:
+        # Distribution of Clarity
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
+        sns.countplot(data=df, x='Clarity', palette=['#739BD0'], ax=ax4)
+        ax4.set_title('Distribution of Clarity', fontsize=14)
+        ax4.set_xlabel('Clarity', fontsize=12)
+        ax4.set_ylabel('Frequency', fontsize=12)
+        st.pyplot(fig4)
 
     # Hexbin plot: Price vs Carat
     fig3, ax3 = plt.subplots(figsize=(10, 6))
