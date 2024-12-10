@@ -327,14 +327,22 @@ with tab4:
     ax1.set_ylabel('Frequency', fontsize=12)
     st.pyplot(fig1)  # Use st.pyplot to display the figure in Streamlit
 
-    # Hexbin plot: Price vs Carat
+    # Distribution plot for Carat
     fig2, ax2 = plt.subplots(figsize=(10, 6))
+    sns.histplot(df['Carat'], bins=50, kde=True, color='blue', ax=ax1)
+    ax1.set_title('Distribution of Carats', fontsize=16)
+    ax1.set_xlabel('Carat', fontsize=12)
+    ax1.set_ylabel('Frequency', fontsize=12)
+    st.pyplot(fig2)  # Use st.pyplot to display the figure in Streamlit
+
+    # Hexbin plot: Price vs Carat
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
     hb = ax2.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)
     cb = plt.colorbar(hb, ax=ax2, label='Count')
     ax2.set_title('Hexbin Plot of Price vs Carat', fontsize=16)
     ax2.set_xlabel('Carat', fontsize=12)
     ax2.set_ylabel('Price ($)', fontsize=12)
-    st.pyplot(fig2)  # Use st.pyplot to display the figure in Streamlit
+    st.pyplot(fig3)  # Use st.pyplot to display the figure in Streamlit
 
     # Facet Grid: Price Distribution by Color
     facet = sns.FacetGrid(df, col='Color', col_wrap=4, height=4, aspect=1)
