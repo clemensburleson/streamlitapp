@@ -204,6 +204,112 @@ with tab2:
                 unsafe_allow_html=True
             )
 
+with tab3:
+
+    import streamlit as st
+    from sklearn.model_selection import train_test_split, GridSearchCV
+    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.metrics import mean_squared_error, r2_score
+    import pandas as pd
+    import numpy as np
+    
+    
+    @st.cache_resource
+    def load_data():
+        # Load a sample dataset
+        from sklearn.datasets import fetch_california_housing
+        data = fetch_california_housing(as_frame=True)
+        df = data.frame
+        df['target'] = data.target
+        return df
+    
+    
+    @st.cache_resource
+    def train_pre_tuned_model(X_train, y_train, X_test, y_test):
+        # Pre-tuned model (default hyperparameters)
+        pre_tuned_model = GradientBoostingRegressor(random_state=42)
+        pre_tuned_model.fit(X_train, y_train)
+        pre_preds = pre_tuned_model.predict(X_test)
+        pre_rmse = np.sqrt(mean_squared_error(y_test, pre_preds))
+        pre_accuracy = r2_score(y_test, pre_preds)
+        return pre_tuned_model, pre_rmse, pre_accuracy
+    
+    
+    @st.cache_resource
+    def train_tuned_model(X_train, y_train, X_test, y_test):
+        # Tuned model (optimized hyperparameters)
+        param_grid = {
+            'n_estimators': [100, 200],
+            'max_depth': [3, 5],
+            'learning_rate': [0.1, 0.01],
+            'subsample': [0.8, 1.0]
+        }
+        grid_search = GridSearchCV(GradientBoostingRegressor(random_state=42), param_grid, cv=3, scoring='neg_mean_squared_error')
+        grid_search.fit(X_train, y_train)
+    
+        # Best tuned model
+        tuned_model = grid_search.best_estimator_
+        tuned_preds = tuned_model.predict(X_test)
+        tuned_rmse = np.sqrt(mean_squared_error(y_test, tuned_preds))
+        tuned_accuracy = r2_score(y_test, tuned_preds)
+        return tuned_model, tuned_rmse, tuned_accuracy
+    
+    
+    @st.cache_resource
+    def get_metrics(pre_rmse, pre_accuracy, tuned_rmse, tuned_accuracy):
+        return f"""
+        **Pre-Tuned Model Performance:**
+        - RMSE: {pre_rmse:.4f}
+        - R² (Accuracy): {pre_accuracy:.4f}
+        
+        **Tuned Model Performance:**
+        - RMSE: {tuned_rmse:.4f}
+        - R² (Accuracy): {tuned_accuracy:.4f}
+        """
+    
+    
+    # Streamlit App UI
+    st.title("Gradient Boosting Model Predictor")
+    st.write("This app trains and evaluates a Gradient Boosting model with both pre-tuned and tuned hyperparameters.")
+    
+    # Load data
+    df = load_data()
+    st.write("### Dataset Preview", df.head())
+    
+    # Split data into features and target
+    X = df.drop("target", axis=1)
+    y = df["target"]
+    
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Train pre-tuned and tuned models
+    pre_tuned_model, pre_rmse, pre_accuracy = train_pre_tuned_model(X_train, y_train, X_test, y_test)
+    tuned_model, tuned_rmse, tuned_accuracy = train_tuned_model(X_train, y_train, X_test, y_test)
+    
+    # Display metrics
+    metrics = get_metrics(pre_rmse, pre_accuracy, tuned_rmse, tuned_accuracy)
+    
+    # Prediction Section
+    st.write("### Make Predictions")
+    uploaded_file = st.file_uploader("Upload a CSV file with the same features as the dataset")
+    
+    if uploaded_file:
+        input_data = pd.read_csv(uploaded_file)
+        st.write("#### Input Data Preview", input_data.head())
+    
+        # Make predictions with the tuned model
+        predictions = tuned_model.predict(input_data)
+        st.write("### Predictions", predictions)
+    
+        # Collapsible metrics section
+        with st.expander("Model Performance Metrics"):
+            st.markdown(metrics)
+    
+    # Footer
+    st.write("This app demonstrates the use of pre-tuned and tuned Gradient Boosting models.")
+
+
 with tab4:
     st.header("Pricing Relationships")
     if 'filtered_diamonds' in locals() and not filtered_diamonds.empty:
