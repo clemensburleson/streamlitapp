@@ -210,11 +210,12 @@ with tab3:
     import streamlit as st
     import pandas as pd
     from catboost import CatBoostRegressor
+    from sklearn.metrics import mean_squared_error, r2_score
     
     st.header("Diamond Price Prediction Tool")
     st.write(
-        "This section uses pre-trained CatBoost models to predict diamond prices. "
-        "You can compare predictions from a pre-tuned and a tuned model."
+        "This section predicts diamond prices using a tuned CatBoost model. "
+        "You can also compare the performance of pre-tuned and tuned models below."
     )
     
     # Define feature list explicitly
@@ -277,21 +278,48 @@ with tab3:
         # Ensure input matches training feature set
         input_data = input_data[FEATURE_COLUMNS]
     
-        # Predict using the pre-trained and tuned models
+        # Predict using the tuned model
         try:
-            pre_tuned_prediction = pre_tuned_model.predict(input_data)[0]
             tuned_prediction = tuned_model.predict(input_data)[0]
     
-            # Display results
+            # Display prediction
             st.markdown(f"""
             <div style="padding: 20px; border-radius: 10px; margin-top: 20px;">
-                <h2>Predicted Prices:</h2>
-                <p><strong>Pre-Tuned Model:</strong> ${pre_tuned_prediction:,.2f}</p>
-                <p><strong>Tuned Model:</strong> ${tuned_prediction:,.2f}</p>
+                <h2>Predicted Price:</h2>
+                <h1>${tuned_prediction:,.2f}</h1>
             </div>
             """, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error making predictions: {e}")
+    
+    # Compare Pre-Tuned and Tuned Model Performance
+    st.subheader("Model Performance Comparison")
+    with st.expander("View Pre-Tuned vs Tuned Model Metrics"):
+        # Prepare features and target for evaluation
+        X = df[FEATURE_COLUMNS]
+        y = df['Price']
+    
+        # Evaluate pre-tuned model
+        pre_tuned_predictions = pre_tuned_model.predict(X)
+        pre_rmse = mean_squared_error(y, pre_tuned_predictions, squared=False)
+        pre_r2 = r2_score(y, pre_tuned_predictions)
+    
+        # Evaluate tuned model
+        tuned_predictions = tuned_model.predict(X)
+        tuned_rmse = mean_squared_error(y, tuned_predictions, squared=False)
+        tuned_r2 = r2_score(y, tuned_predictions)
+    
+        # Display metrics
+        st.markdown(f"""
+        **Pre-Tuned Model Performance:**
+        - RMSE: {pre_rmse:.2f}
+        - R²: {pre_r2:.2f}
+    
+        **Tuned Model Performance:**
+        - RMSE: {tuned_rmse:.2f}
+        - R²: {tuned_r2:.2f}
+        """)
+
 
 
 with tab4:
