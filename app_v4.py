@@ -365,7 +365,7 @@ with tab4:
     fig3, ax3 = plt.subplots(figsize=(10, 6))
     hb = ax3.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
     cb = plt.colorbar(hb, ax=ax3, label='Count')
-    ax3.set_title('Hexbin Plot of Price vs Carat', fontsize=16)
+    ax3.set_title('Price vs Carat', fontsize=16)
     ax3.set_xlabel('Carat', fontsize=12)
     ax3.set_ylabel('Price ($)', fontsize=12)
     st.pyplot(fig3)
