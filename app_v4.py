@@ -216,7 +216,8 @@ with tab3:
     categorical_features = X.select_dtypes(include=['object']).columns.tolist()
     for col in categorical_features:
         X[col] = X[col].astype('category').cat.codes
-
+    
+    from sklearn.model_selection import train_test_split
     # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
