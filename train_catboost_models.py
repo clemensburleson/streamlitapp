@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Dec 10 15:08:45 2024
-
-@author: clemensburleson
-"""
-
 import pandas as pd
 from catboost import CatBoostRegressor
 from sklearn.model_selection import train_test_split
@@ -14,8 +6,11 @@ from sklearn.model_selection import train_test_split
 df = pd.read_csv("diamonds.csv")
 df.columns = df.columns.str.capitalize()
 
-# Prepare features and target
-X = df.drop(columns=['Price'], errors='ignore')
+# Define the feature list explicitly
+FEATURE_COLUMNS = ['Carat', 'Cut', 'Color', 'Clarity', 'Depth', 'Table']
+
+# Ensure only the defined features are used
+X = df[FEATURE_COLUMNS]
 y = df['Price']
 
 # Handle missing values
@@ -26,20 +21,25 @@ y = y.fillna(0)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train a pre-tuned CatBoost model (default parameters)
-pre_tuned_model = CatBoostRegressor(cat_features=list(X.select_dtypes(include=['object']).columns), verbose=0)
+pre_tuned_model = CatBoostRegressor(cat_features=['Cut', 'Color', 'Clarity'], verbose=0)
 pre_tuned_model.fit(X_train, y_train)
 pre_tuned_model.save_model("pre_tuned_catboost_model.cbm")
 
-# Define hyperparameters for tuning
+# Train a tuned CatBoost model
 tuned_model = CatBoostRegressor(
     iterations=1000,
     learning_rate=0.03,
     depth=6,
     l2_leaf_reg=3,
     bagging_temperature=1,
-    cat_features=list(X.select_dtypes(include=['object']).columns),
+    cat_features=['Cut', 'Color', 'Clarity'],
     verbose=0
 )
+tuned_model.fit(X_train, y_train)
+tuned_model.save_model("tuned_catboost_model.cbm")
+
+print("Pre-tuned and tuned CatBoost models have been trained and saved successfully!")
+
 tuned_model.fit(X_train, y_train)
 tuned_model.save_model("tuned_catboost_model.cbm")
 
