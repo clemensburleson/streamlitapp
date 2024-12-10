@@ -35,13 +35,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Add the banner section
+# Banner section
 st.markdown(
     """
-    <div style="background-color: #000000; padding: 20px; text-align: center; border-radius: 5px; margin-bottom: 20px;">
-        <h1 style="color: #ffffff; font-family: Arial, sans-serif;">💎 Welcome to Diamond Brothers 💎</h1>
-        <h3 style="color: #ffffff; font-family: Arial, sans-serif;">The world's best diamond pricing tool for transparency and confidence</h3>
-    </div>
+    <h1 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">💎 Welcome to Diamond Brothers 💎</h1>
+    <h3 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">The world's best diamond pricing tool for transparency and confidence</h3>
     """,
     unsafe_allow_html=True
 )
