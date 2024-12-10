@@ -205,39 +205,34 @@ with tab2:
             )
 
 with tab3:
+    st.header("Diamond Price Prediction Tool")
+    st.write("Train and evaluate a Gradient Boosting model on the diamond dataset. Compare pre-tuned and tuned model performance.")
 
-    import streamlit as st
-    from sklearn.model_selection import train_test_split, GridSearchCV
-    from sklearn.ensemble import GradientBoostingRegressor
-    from sklearn.metrics import mean_squared_error, r2_score
-    import pandas as pd
-    import numpy as np
-    
-    
-    @st.cache_resource
-    def load_data():
-        # Load a sample dataset
-        from sklearn.datasets import fetch_california_housing
-        data = fetch_california_housing(as_frame=True)
-        df = data.frame
-        df['target'] = data.target
-        return df
-    
-    
+    # Split data into features and target
+    X = df.drop(columns=['Price', 'Table', 'Depth'])  # Drop unused columns
+    y = df['Price']  # Target variable
+
+    # Encode categorical features
+    categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+    for col in categorical_features:
+        X[col] = X[col].astype('category').cat.codes
+
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train pre-tuned model
     @st.cache_resource
     def train_pre_tuned_model(X_train, y_train, X_test, y_test):
-        # Pre-tuned model (default hyperparameters)
         pre_tuned_model = GradientBoostingRegressor(random_state=42)
         pre_tuned_model.fit(X_train, y_train)
         pre_preds = pre_tuned_model.predict(X_test)
         pre_rmse = np.sqrt(mean_squared_error(y_test, pre_preds))
-        pre_accuracy = r2_score(y_test, pre_preds)
-        return pre_tuned_model, pre_rmse, pre_accuracy
-    
-    
+        pre_r2 = r2_score(y_test, pre_preds)
+        return pre_tuned_model, pre_rmse, pre_r2
+
+    # Train tuned model
     @st.cache_resource
     def train_tuned_model(X_train, y_train, X_test, y_test):
-        # Tuned model (optimized hyperparameters)
         param_grid = {
             'n_estimators': [100, 200],
             'max_depth': [3, 5],
@@ -246,68 +241,76 @@ with tab3:
         }
         grid_search = GridSearchCV(GradientBoostingRegressor(random_state=42), param_grid, cv=3, scoring='neg_mean_squared_error')
         grid_search.fit(X_train, y_train)
-    
+
         # Best tuned model
         tuned_model = grid_search.best_estimator_
         tuned_preds = tuned_model.predict(X_test)
         tuned_rmse = np.sqrt(mean_squared_error(y_test, tuned_preds))
-        tuned_accuracy = r2_score(y_test, tuned_preds)
-        return tuned_model, tuned_rmse, tuned_accuracy
-    
-    
-    @st.cache_resource
-    def get_metrics(pre_rmse, pre_accuracy, tuned_rmse, tuned_accuracy):
-        return f"""
-        **Pre-Tuned Model Performance:**
-        - RMSE: {pre_rmse:.4f}
-        - R² (Accuracy): {pre_accuracy:.4f}
-        
-        **Tuned Model Performance:**
-        - RMSE: {tuned_rmse:.4f}
-        - R² (Accuracy): {tuned_accuracy:.4f}
-        """
-    
-    
-    # Streamlit App UI
-    st.title("Gradient Boosting Model Predictor")
-    st.write("This app trains and evaluates a Gradient Boosting model with both pre-tuned and tuned hyperparameters.")
-    
-    # Load data
-    df = load_data()
-    st.write("### Dataset Preview", df.head())
-    
-    # Split data into features and target
-    X = df.drop("target", axis=1)
-    y = df["target"]
-    
-    # Train/test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Train pre-tuned and tuned models
-    pre_tuned_model, pre_rmse, pre_accuracy = train_pre_tuned_model(X_train, y_train, X_test, y_test)
-    tuned_model, tuned_rmse, tuned_accuracy = train_tuned_model(X_train, y_train, X_test, y_test)
-    
+        tuned_r2 = r2_score(y_test, tuned_preds)
+        return tuned_model, tuned_rmse, tuned_r2
+
+    # Train both models and retrieve performance metrics
+    pre_tuned_model, pre_rmse, pre_r2 = train_pre_tuned_model(X_train, y_train, X_test, y_test)
+    tuned_model, tuned_rmse, tuned_r2 = train_tuned_model(X_train, y_train, X_test, y_test)
+
     # Display metrics
-    metrics = get_metrics(pre_rmse, pre_accuracy, tuned_rmse, tuned_accuracy)
-    
+    st.subheader("Model Performance Comparison")
+    st.write("Evaluate the performance of the pre-tuned and tuned models:")
+    st.markdown(f"""
+    **Pre-Tuned Model Performance:**
+    - RMSE: {pre_rmse:.2f}
+    - R²: {pre_r2:.2f}
+
+    **Tuned Model Performance:**
+    - RMSE: {tuned_rmse:.2f}
+    - R²: {tuned_r2:.2f}
+    """)
+
     # Prediction Section
-    st.write("### Make Predictions")
-    uploaded_file = st.file_uploader("Upload a CSV file with the same features as the dataset")
-    
-    if uploaded_file:
-        input_data = pd.read_csv(uploaded_file)
-        st.write("#### Input Data Preview", input_data.head())
-    
-        # Make predictions with the tuned model
-        predictions = tuned_model.predict(input_data)
-        st.write("### Predictions", predictions)
-    
-        # Collapsible metrics section
-        with st.expander("Model Performance Metrics"):
-            st.markdown(metrics)
-    
-    # Footer
-    st.write("This app demonstrates the use of pre-tuned and tuned Gradient Boosting models.")
+    st.subheader("Make Predictions")
+
+    # Input fields
+    with st.form("prediction_form"):
+        Carat = st.slider("Carat", min_value=float(df["Carat"].min()), max_value=float(df["Carat"].max()), value=1.0, step=0.01)
+        Cut = st.selectbox("Cut", options=df["Cut"].unique())
+        Color = st.selectbox("Color", options=df["Color"].unique())
+        Clarity = st.selectbox("Clarity", options=df["Clarity"].unique())
+        submitted = st.form_submit_button("Predict Price")
+
+    if submitted:
+        # Prepare input data for prediction
+        input_data = pd.DataFrame({
+            'Carat': [Carat],
+            'Cut': [Cut],
+            'Color': [Color],
+            'Clarity': [Clarity]
+        })
+
+        # Encode categorical features for the model
+        for col in categorical_features:
+            input_data[col] = input_data[col].astype('category').cat.codes
+
+        # Predict using the tuned model
+        prediction = tuned_model.predict(input_data)[0]
+
+        # Display the prediction
+        st.markdown(
+            f"""
+            <div style="background-color: #739BD0; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px;">
+                <h2 style="color: #ffffff;">Estimated Price:</h2>
+                <h1 style="color: #ffffff;">${prediction:,.2f}</h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # Collapsible metrics section
+    with st.expander("Model Performance Details"):
+        st.write("#### Performance Comparison")
+        st.markdown(f"""
+        - **Pre-Tuned Model RMSE:** {pre_rmse:.2f}, R²: {pre_r2:.2f}
+        - **Tuned Model RMSE:** {tuned_rmse:.2f}, R²: {tuned_r2:.2f}
+        """)
 
 
 with tab4:
