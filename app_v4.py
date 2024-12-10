@@ -209,135 +209,139 @@ from sklearn.ensemble import GradientBoostingRegressor
 with tab3:
     st.header("Diamond Price Prediction Tool")
     st.write(
-        "Train and evaluate a Gradient Boosting model on the diamond dataset. "
-        "Compare pre-tuned and tuned model performance, and predict diamond prices."
+        "This section trains and evaluates a Gradient Boosting model on the diamond dataset. "
+        "You can compare the performance of pre-tuned and tuned models and predict diamond prices."
     )
 
-    # Ensure the dataset (`df`) is loaded and contains required columns
+    # Ensure dataset (`df`) is loaded and validate required columns
     required_columns = ['Carat', 'Cut', 'Color', 'Clarity', 'Price']
     if not all(col in df.columns for col in required_columns):
         st.error(
-            "The dataset is missing required columns: "
-            f"{', '.join(required_columns)}. Please check your data."
+            f"The dataset is missing required columns: {', '.join(set(required_columns) - set(df.columns))}. "
+            "Please check your data source."
         )
-    else:
-        # Prepare data
-        X = df.drop(columns=['Price', 'Table', 'Depth'], errors='ignore')  # Exclude unnecessary columns
-        y = df['Price']
+        st.stop()
 
-        # Handle missing values in the dataset
-        X = X.fillna(0)
-        y = y.fillna(0)
+    # Prepare data
+    X = df.drop(columns=['Price'], errors='ignore')  # Exclude 'Price' as it's the target
+    y = df['Price']  # Target variable
 
-        # Encode categorical features
-        categorical_features = X.select_dtypes(include=['object']).columns.tolist()
-        for col in categorical_features:
-            X[col] = X[col].astype('category').cat.codes
+    # Handle missing values
+    X = X.fillna(0)
+    y = y.fillna(0)
 
-        # Train/test split
+    # Encode categorical features
+    categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+    for col in categorical_features:
+        X[col] = X[col].astype('category').cat.codes
+
+    # Train/test split
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    except ValueError as e:
+        st.error(f"Error during train/test split: {e}")
+        st.stop()
+
+    # Pre-tuned model training function
+    @st.cache_resource
+    def train_pre_tuned_model(X_train, y_train, X_test, y_test):
         try:
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        except ValueError as e:
-            st.error(f"Error splitting the data: {e}")
+            model = GradientBoostingRegressor(random_state=42)
+            model.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            rmse = np.sqrt(mean_squared_error(y_test, preds))
+            r2 = r2_score(y_test, preds)
+            return model, rmse, r2
+        except Exception as e:
+            st.error(f"Error training the pre-tuned model: {e}")
             st.stop()
 
-        # Train pre-tuned model
-        @st.cache_resource
-        def train_pre_tuned_model(X_train, y_train, X_test, y_test):
-            try:
-                model = GradientBoostingRegressor(random_state=42)
-                model.fit(X_train, y_train)
-                preds = model.predict(X_test)
-                rmse = np.sqrt(mean_squared_error(y_test, preds))
-                r2 = r2_score(y_test, preds)
-                return model, rmse, r2
-            except Exception as e:
-                st.error(f"Error training pre-tuned model: {e}")
-                st.stop()
+    # Tuned model training function
+    @st.cache_resource
+    def train_tuned_model(X_train, y_train, X_test, y_test):
+        try:
+            param_grid = {
+                'n_estimators': [100, 200],
+                'max_depth': [3, 5],
+                'learning_rate': [0.1, 0.01],
+                'subsample': [0.8, 1.0]
+            }
+            grid_search = GridSearchCV(
+                GradientBoostingRegressor(random_state=42),
+                param_grid,
+                cv=3,
+                scoring='neg_mean_squared_error'
+            )
+            grid_search.fit(X_train, y_train)
+            best_model = grid_search.best_estimator_
+            preds = best_model.predict(X_test)
+            rmse = np.sqrt(mean_squared_error(y_test, preds))
+            r2 = r2_score(y_test, preds)
+            return best_model, rmse, r2
+        except Exception as e:
+            st.error(f"Error training the tuned model: {e}")
+            st.stop()
 
-        # Train tuned model
-        @st.cache_resource
-        def train_tuned_model(X_train, y_train, X_test, y_test):
-            try:
-                param_grid = {
-                    'n_estimators': [100, 200],
-                    'max_depth': [3, 5],
-                    'learning_rate': [0.1, 0.01],
-                    'subsample': [0.8, 1.0]
-                }
-                grid_search = GridSearchCV(
-                    GradientBoostingRegressor(random_state=42),
-                    param_grid,
-                    cv=3,
-                    scoring='neg_mean_squared_error'
-                )
-                grid_search.fit(X_train, y_train)
-                best_model = grid_search.best_estimator_
-                preds = best_model.predict(X_test)
-                rmse = np.sqrt(mean_squared_error(y_test, preds))
-                r2 = r2_score(y_test, preds)
-                return best_model, rmse, r2
-            except Exception as e:
-                st.error(f"Error training tuned model: {e}")
-                st.stop()
+    # Train models and display metrics
+    pre_tuned_model, pre_rmse, pre_r2 = train_pre_tuned_model(X_train, y_train, X_test, y_test)
+    tuned_model, tuned_rmse, tuned_r2 = train_tuned_model(X_train, y_train, X_test, y_test)
 
-        # Train models and get metrics
-        pre_tuned_model, pre_rmse, pre_r2 = train_pre_tuned_model(X_train, y_train, X_test, y_test)
-        tuned_model, tuned_rmse, tuned_r2 = train_tuned_model(X_train, y_train, X_test, y_test)
+    # Display performance metrics
+    st.subheader("Model Performance Comparison")
+    st.write("Evaluate the performance of pre-tuned and tuned models:")
+    st.markdown(f"""
+    **Pre-Tuned Model Performance:**
+    - RMSE: {pre_rmse:.2f}
+    - R²: {pre_r2:.2f}
 
-        # Display metrics
-        st.subheader("Model Performance Comparison")
-        st.markdown(f"""
-        **Pre-Tuned Model Performance:**
-        - RMSE: {pre_rmse:.2f}
-        - R²: {pre_r2:.2f}
+    **Tuned Model Performance:**
+    - RMSE: {tuned_rmse:.2f}
+    - R²: {tuned_r2:.2f}
+    """)
 
-        **Tuned Model Performance:**
-        - RMSE: {tuned_rmse:.2f}
-        - R²: {tuned_r2:.2f}
-        """)
+    # Prediction Section
+    st.subheader("Make Predictions")
+    with st.form("prediction_form"):
+        # Input fields for user input
+        Carat = st.slider("Carat", min_value=float(df["Carat"].min()), max_value=float(df["Carat"].max()), value=1.0, step=0.01)
+        Cut = st.selectbox("Cut", options=df["Cut"].unique())
+        Color = st.selectbox("Color", options=df["Color"].unique())
+        Clarity = st.selectbox("Clarity", options=df["Clarity"].unique())
+        submitted = st.form_submit_button("Predict Price")
 
-        # Prediction Section
-        st.subheader("Make Predictions")
-        with st.form("prediction_form"):
-            Carat = st.slider("Carat", min_value=float(df["Carat"].min()), max_value=float(df["Carat"].max()), value=1.0, step=0.01)
-            Cut = st.selectbox("Cut", options=df["Cut"].unique())
-            Color = st.selectbox("Color", options=df["Color"].unique())
-            Clarity = st.selectbox("Clarity", options=df["Clarity"].unique())
-            submitted = st.form_submit_button("Predict Price")
+    if submitted:
+        # Prepare input data
+        input_data = pd.DataFrame({
+            'Carat': [Carat],
+            'Cut': [Cut],
+            'Color': [Color],
+            'Clarity': [Clarity]
+        })
 
-        if submitted:
-            # Prepare input data for prediction
-            input_data = pd.DataFrame({
-                'Carat': [Carat],
-                'Cut': [Cut],
-                'Color': [Color],
-                'Clarity': [Clarity]
-            })
-
-            # Encode categorical features for prediction
-            for col in categorical_features:
+        # Encode categorical features for the model
+        for col in categorical_features:
+            if col in input_data.columns:
                 input_data[col] = input_data[col].astype('category').cat.codes
 
-            # Predict using the tuned model
-            try:
-                prediction = tuned_model.predict(input_data)[0]
-                st.markdown(f"""
-                <div style="background-color: #739BD0; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px;">
-                    <h2 style="color: #ffffff;">Estimated Price:</h2>
-                    <h1 style="color: #ffffff;">${prediction:,.2f}</h1>
-                </div>
-                """, unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Error making prediction: {e}")
-
-        # Collapsible metrics section
-        with st.expander("Model Performance Details"):
-            st.write("#### Performance Comparison")
+        # Predict using the tuned model
+        try:
+            prediction = tuned_model.predict(input_data)[0]
             st.markdown(f"""
-            - **Pre-Tuned Model RMSE:** {pre_rmse:.2f}, R²: {pre_r2:.2f}
-            - **Tuned Model RMSE:** {tuned_rmse:.2f}, R²: {tuned_r2:.2f}
-            """)
+            <div style="background-color: #739BD0; padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px;">
+                <h2 style="color: #ffffff;">Estimated Price:</h2>
+                <h1 style="color: #ffffff;">${prediction:,.2f}</h1>
+            </div>
+            """, unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error making prediction: {e}")
+
+    # Collapsible metrics section
+    with st.expander("Model Performance Details"):
+        st.markdown(f"""
+        - **Pre-Tuned Model RMSE:** {pre_rmse:.2f}, R²: {pre_r2:.2f}
+        - **Tuned Model RMSE:** {tuned_rmse:.2f}, R²: {tuned_r2:.2f}
+        """)
+
 
 
 
