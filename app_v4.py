@@ -336,27 +336,6 @@ with tab4:
     ax2.set_ylabel('Price ($)', fontsize=12)
     st.pyplot(fig2)  # Use st.pyplot to display the figure in Streamlit
 
-    # Pair Plot of Numeric Features
-    fig5 = sns.pairplot(df, vars=['Price', 'Carat', 'Depth', 'Table'], diag_kind='kde', corner=True, palette='viridis')
-    fig5.fig.suptitle('Pair Plot of Numeric Features', y=1.02, fontsize=16)
-    st.pyplot(fig5)
-
-    # Correlation Heatmap
-    fig6, ax6 = plt.subplots(figsize=(10, 6))
-    corr_matrix = df[['Price', 'Carat', 'Depth', 'Table', 'X', 'Y', 'Z']].corr()
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax6)
-    ax6.set_title('Correlation Heatmap of Features', fontsize=16)
-    st.pyplot(fig6)
-
-    # Line Plot: Average Price by Carat
-    avg_price_by_carat = df.groupby('Carat')['Price'].mean().reset_index()
-    fig7, ax7 = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=avg_price_by_carat, x='Carat', y='Price', ax=ax7, color='green')
-    ax7.set_title('Average Price by Carat', fontsize=16)
-    ax7.set_xlabel('Carat', fontsize=12)
-    ax7.set_ylabel('Average Price ($)', fontsize=12)
-    st.pyplot(fig7)
-
     # Facet Grid: Price Distribution by Color
     facet = sns.FacetGrid(df, col='Color', col_wrap=4, height=4, aspect=1)
     facet.map(sns.histplot, 'Price', kde=True, bins=30, color='purple')
