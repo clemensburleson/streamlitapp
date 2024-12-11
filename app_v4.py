@@ -39,12 +39,12 @@ st.markdown(
 # Sidebar welcome message
 st.sidebar.header("Welcome to the home of Diamond pricing!")
 st.sidebar.write("""
-This Diamond Brothers app gives you a clear concise and digestible overview of diamond pricing mechanics! 
-The app uses a CatBoost model to predict the price of any diamond based on: Carat, Color, Cut, and Clarity. 
+This Diamond Brothers app gives users a clear, concise and digestible overview of diamond pricing mechanics! 
+The app features a CatBoost model to predict the price of any diamond based on: Carat, Color, Cut, and Clarity. 
 Have fun and keep on learning!
 """)
 
-st.markdown("By Clemens Burleson & Aksh Iyer from the University of St. Gallen under the instruction of Prof. Dr. Ivo Blohm")
+st.markdown("By Clemens Burleson & Aksh Iyer from the University of St. Gallen under the instructions and guidance of Prof. Dr. Ivo Blohm")
 
 #### Define Load functions and load data
 ###########################################
