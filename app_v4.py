@@ -362,7 +362,7 @@ with tab4:
         st.pyplot(fig4)
 
     # Hexbin plot: Price vs Carat
-    col5, col6 = st.columns([2])  # Adjust column widths for balance
+    col5, col6 = st.columns(2)
 
     with col5:
         fig5, ax5 = plt.subplots(figsize=(4, 2))
