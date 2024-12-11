@@ -375,7 +375,6 @@ with tab4:
 
     with col6:
         # Feature Importance Visualization
-        st.subheader("Feature Importance")
     
         try:
             # Use the feature columns from the data loaded into the model
