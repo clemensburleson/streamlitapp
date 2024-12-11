@@ -376,16 +376,25 @@ with tab4:
     with col6:
         # Feature Importance Visualization
         st.subheader("Feature Importance")
+    
+        try:
+            # Calculate feature importance from tuned model
+            feature_importances = tuned_model.get_feature_importance()
+            feature_names = X_train.columns  # Use training feature names
+            
+            # Create a DataFrame for feature importance
+            feature_importances_df = pd.DataFrame({
+                'Feature': feature_names,
+                'Importance': feature_importances
+            }).sort_values(by='Importance', ascending=False)
+    
+            # Plot feature importance
+            fig6, ax6 = plt.subplots(figsize=(4, 4))
+            sns.barplot(x='Importance', y='Feature', data=feature_importances_df, palette=['#739BD0'], ax=ax6)
+            ax6.set_title('Feature Importance', fontsize=14)
+            ax6.set_xlabel('Importance', fontsize=12)
+            ax6.set_ylabel('Feature', fontsize=12)
+            st.pyplot(fig6)
+        except Exception as e:
+            st.error(f"Failed to load feature importance: {e}")
 
-        # Calculate feature importance from tuned model
-        feature_importances = tuned_model.get_feature_importance(prettified=True)
-        feature_importances_df = pd.DataFrame(feature_importances, columns=['Feature', 'Importance'])
-        feature_importances_df = feature_importances_df.sort_values(by='Importance', ascending=False)
-
-        # Plot feature importance
-        fig6, ax6 = plt.subplots(figsize=(4, 4))
-        sns.barplot(x='Importance', y='Feature', data=feature_importances_df, palette=['#739BD0'], ax=ax6)
-        ax6.set_title('Feature Importance', fontsize=14)
-        ax6.set_xlabel('Importance', fontsize=12)
-        ax6.set_ylabel('Feature', fontsize=12)
-        st.pyplot(fig6)
