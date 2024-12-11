@@ -321,7 +321,7 @@ with tab4:
 
     # Carat and Cut Distributions (Side by Side)
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Distribution of Carat
         fig1, ax1 = plt.subplots(figsize=(4, 2))
@@ -330,7 +330,7 @@ with tab4:
         ax1.set_xlabel('Carat', fontsize=12)
         ax1.set_ylabel('Frequency', fontsize=12)
         st.pyplot(fig1)
-    
+
     with col2:
         # Distribution of Cut
         fig2, ax2 = plt.subplots(figsize=(4, 2))
@@ -339,10 +339,10 @@ with tab4:
         ax2.set_xlabel('Cut', fontsize=12)
         ax2.set_ylabel('Frequency', fontsize=12)
         st.pyplot(fig2)
-    
+
     # Color and Clarity Distributions (Side by Side)
     col3, col4 = st.columns(2)
-    
+
     with col3:
         # Distribution of Color
         fig3, ax3 = plt.subplots(figsize=(4, 2))
@@ -351,7 +351,7 @@ with tab4:
         ax3.set_xlabel('Color', fontsize=12)
         ax3.set_ylabel('Frequency', fontsize=12)
         st.pyplot(fig3)
-    
+
     with col4:
         # Distribution of Clarity
         fig4, ax4 = plt.subplots(figsize=(4, 2))
@@ -362,10 +362,30 @@ with tab4:
         st.pyplot(fig4)
 
     # Hexbin plot: Price vs Carat
-    fig3, ax3 = plt.subplots(figsize=(10, 6))
-    hb = ax3.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
-    cb = plt.colorbar(hb, ax=ax3, label='Count')
-    ax3.set_title('Price vs Carat', fontsize=16)
-    ax3.set_xlabel('Carat', fontsize=12)
-    ax3.set_ylabel('Price ($)', fontsize=12)
-    st.pyplot(fig3)
+    col5, col6 = st.columns([2, 1])  # Adjust column widths for balance
+
+    with col5:
+        fig5, ax5 = plt.subplots(figsize=(6, 4))
+        hb = ax5.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
+        cb = plt.colorbar(hb, ax=ax5, label='Count')
+        ax5.set_title('Price vs Carat', fontsize=14)
+        ax5.set_xlabel('Carat', fontsize=12)
+        ax5.set_ylabel('Price ($)', fontsize=12)
+        st.pyplot(fig5)
+
+    with col6:
+        # Feature Importance Visualization
+        st.subheader("Feature Importance")
+
+        # Calculate feature importance from tuned model
+        feature_importances = tuned_model.get_feature_importance(prettified=True)
+        feature_importances_df = pd.DataFrame(feature_importances, columns=['Feature', 'Importance'])
+        feature_importances_df = feature_importances_df.sort_values(by='Importance', ascending=False)
+
+        # Plot feature importance
+        fig6, ax6 = plt.subplots(figsize=(4, 4))
+        sns.barplot(x='Importance', y='Feature', data=feature_importances_df, palette=['#739BD0'], ax=ax6)
+        ax6.set_title('Feature Importance', fontsize=14)
+        ax6.set_xlabel('Importance', fontsize=12)
+        ax6.set_ylabel('Feature', fontsize=12)
+        st.pyplot(fig6)
