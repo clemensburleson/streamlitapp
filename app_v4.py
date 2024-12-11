@@ -378,10 +378,12 @@ with tab4:
         st.subheader("Feature Importance")
     
         try:
+            # Use the feature columns from the data loaded into the model
+            feature_names = df.drop(columns=['Price'], errors='ignore').columns
+    
             # Calculate feature importance from tuned model
             feature_importances = tuned_model.get_feature_importance()
-            feature_names = X_train.columns  # Use training feature names
-            
+    
             # Create a DataFrame for feature importance
             feature_importances_df = pd.DataFrame({
                 'Feature': feature_names,
@@ -397,4 +399,5 @@ with tab4:
             st.pyplot(fig6)
         except Exception as e:
             st.error(f"Failed to load feature importance: {e}")
+
 
