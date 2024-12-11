@@ -365,7 +365,7 @@ with tab4:
     col5, col6 = st.columns([2, 1])  # Adjust column widths for balance
 
     with col5:
-        fig5, ax5 = plt.subplots(figsize=(6, 4))
+        fig5, ax5 = plt.subplots(figsize=(4, 2))
         hb = ax5.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
         cb = plt.colorbar(hb, ax=ax5, label='Count')
         ax5.set_title('Price vs Carat', fontsize=14)
@@ -391,7 +391,7 @@ with tab4:
             }).sort_values(by='Importance', ascending=False)
     
             # Plot feature importance
-            fig6, ax6 = plt.subplots(figsize=(4, 4))
+            fig6, ax6 = plt.subplots(figsize=(4, 2))
             sns.barplot(x='Importance', y='Feature', data=feature_importances_df, palette=['#739BD0'], ax=ax6)
             ax6.set_title('Feature Importance', fontsize=14)
             ax6.set_xlabel('Importance', fontsize=12)
