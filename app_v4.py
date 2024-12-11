@@ -11,7 +11,7 @@ st.set_page_config(
     layout='wide'
 )
 
-# Apply custom CSS for dark background
+# Using CSS for dark background (didn't appear to work, so this is WIP)
 st.markdown(
     """
     <style>
@@ -27,7 +27,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Banner section
+# Page title
 st.markdown(
     """
     <h1 style="color: #ffffff; font-family: Arial, sans-serif; text-align: center;">💎 Diamond Brothers 💎</h1>
@@ -50,7 +50,7 @@ st.markdown("By Clemens Burleson & Aksh Iyer from the University of St. Gallen u
 ###########################################
 @st.cache_data()
 def load_data():
-    # Load the data and rename columns to have capitalized first letters
+    # Load data and rename columns to have capitalized first letters
     df = pd.read_csv("diamonds.csv")
     df.columns = df.columns.str.capitalize()  # Capitalize all column titles
     return df.dropna()
@@ -61,7 +61,7 @@ tab1, tab2, tab3, tab4 = st.tabs(["Diamond Guide", "Filtered Diamonds", "Price P
 
 with tab1:
     st.header("Diamond Color Guide")
-    # Dictionary to map diamond colors to visual representations
+    # Dictionary to map diamond colors
     color_descriptions = {
         "D": "Completely colorless, the highest grade of diamond color.",
         "E": "Exceptional white, minute traces of color detectable.",
@@ -97,7 +97,7 @@ with tab1:
             unsafe_allow_html=True
         )
 
-    # Add a section for Diamond Sizes
+    # Section for diamond sizes
     st.header("Diamond Sizes (Carats)")
 
     # Display the image with a caption
@@ -106,19 +106,19 @@ with tab1:
 with tab2:
     st.header("Filtered Diamonds")
 
-    # Create two main columns for layout
-    col1, col2 = st.columns([1, 1])  # Equal-width columns for filter options and filtered data
+    # two main columns for layout
+    col1, col2 = st.columns([1, 1])
 
     with col1:  # Filter options on the left
         st.subheader("Filter Options")
 
-        # Slider for price range (formatted with commas, no decimals)
+        # Slider for price range (formatted with commas (didn't work, so WIP), no decimals)
         price_range = st.slider(
             "Select Desired Price Range",
-            min_value=int(df["Price"].min()),  # Cast to int to remove decimals
-            max_value=int(df["Price"].max()),  # Cast to int to remove decimals
-            value=(int(df["Price"].min()), int(df["Price"].max())),  # Set initial range as integers
-            format="%d"  # Display numbers without decimals
+            min_value=int(df["Price"].min()),  # Removing decimals
+            max_value=int(df["Price"].max()),  # Removing decimals
+            value=(int(df["Price"].min()), int(df["Price"].max())),  # Setting initial range as integers
+            format="%d"  # Displaying numbers without decimals
         )
     
         # Slider for carat range
@@ -177,7 +177,7 @@ with tab2:
         if filtered_diamonds.empty:
             st.warning("No diamonds match your selected criteria. Please adjust the filters.")
         else:
-            # Center the filtered data horizontally
+            # Center filtered data horizontally (didn't work as I hoped, so WIP)
             st.markdown(
                 """
                 <div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
@@ -185,7 +185,7 @@ with tab2:
                 """,
                 unsafe_allow_html=True
             )
-            # Display the filtered DataFrame with selected columns
+            # Display the filtered df with selected columns
             st.dataframe(filtered_diamonds[columns_to_display].reset_index(drop=True))  # Reset index and drop the original one
             st.markdown(
                 """
@@ -210,7 +210,7 @@ with tab3:
         "You can also compare the performance of pre-tuned and tuned models below."
     )
     
-    # Define feature list explicitly
+    # Defining feature list explicitly (only way around persistent errors) 
     FEATURE_COLUMNS = ['Carat', 'Cut', 'Color', 'Clarity', 'Depth', 'Table', 'X', 'Y', 'Z']
     
     # Load pre-trained models
@@ -228,7 +228,7 @@ with tab3:
     
     pre_tuned_model, tuned_model = load_models()
     
-    # Load dataset
+    # Loading dataset
     @st.cache_data()
     def load_data():
         df = pd.read_csv("diamonds.csv")
@@ -244,7 +244,7 @@ with tab3:
     default_y = df["Y"].mean()
     default_z = df["Z"].mean()
     
-    # Prediction Section
+    # Prediction section
     st.subheader("Make Predictions")
     with st.form("prediction_form"):
         Carat = st.slider("Carat", min_value=float(df["Carat"].min()), max_value=float(df["Carat"].max()), value=1.0, step=0.01)
@@ -254,27 +254,27 @@ with tab3:
         submitted = st.form_submit_button("Predict Price")
     
     if submitted:
-        # Prepare input data
+        # Input data
         input_data = pd.DataFrame({
             'Carat': [Carat],
             'Cut': [Cut],
             'Color': [Color],
             'Clarity': [Clarity],
-            'Depth': [default_depth],  # Add default depth
-            'Table': [default_table],  # Add default table
-            'X': [default_x],          # Add default X
-            'Y': [default_y],          # Add default Y
-            'Z': [default_z]           # Add default Z
+            'Depth': [default_depth],  # Adding default depth
+            'Table': [default_table],  # Adding default table
+            'X': [default_x],          # Adding default X
+            'Y': [default_y],          # Adding default Y
+            'Z': [default_z]           # Adding default Z
         })
     
-        # Ensure input matches training feature set
+        # Ensuring input matches training feature set (result of troubleshooting)
         input_data = input_data[FEATURE_COLUMNS]
     
-        # Predict using the tuned model
+        # Predicting using tuned model
         try:
             tuned_prediction = tuned_model.predict(input_data)[0]
     
-            # Display prediction
+            # Displaying prediction
             st.markdown(f"""
             <div style="padding: 20px; border-radius: 10px; margin-top: 20px;">
                 <h2>Predicted Price:</h2>
@@ -284,24 +284,24 @@ with tab3:
         except Exception as e:
             st.error(f"Error making predictions: {e}")
     
-    # Compare Pre-Tuned and Tuned Model Performance
+    # Comparing pre-tuned and tuned model performance
     st.subheader("Model Performance Comparison")
     with st.expander("View Pre-Tuned vs Tuned Model Metrics"):
-        # Prepare features and target for evaluation
+        
         X = df[FEATURE_COLUMNS]
         y = df['Price']
     
-        # Evaluate pre-tuned model
+        # Evaluating pre-tuned model
         pre_tuned_predictions = pre_tuned_model.predict(X)
         pre_rmse = np.sqrt(mean_squared_error(y, pre_tuned_predictions))
         pre_r2 = r2_score(y, pre_tuned_predictions)
     
-        # Evaluate tuned model
+        # Evaluating tuned model
         tuned_predictions = tuned_model.predict(X)
         tuned_rmse = np.sqrt(mean_squared_error(y, tuned_predictions))
         tuned_r2 = r2_score(y, tuned_predictions)
     
-        # Display metrics
+        # Displaying metrics
         st.markdown(f"""
         **Pre-Tuned Model Performance:**
         - RMSE: {pre_rmse:.2f}
@@ -319,7 +319,7 @@ with tab4:
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    # Carat and Cut Distributions (Side by Side)
+    # Carat and Cut distributions
     col1, col2 = st.columns(2)
 
     with col1:
@@ -340,7 +340,7 @@ with tab4:
         ax2.set_ylabel('Frequency', fontsize=12)
         st.pyplot(fig2)
 
-    # Color and Clarity Distributions (Side by Side)
+    # Color and Clarity distributions
     col3, col4 = st.columns(2)
 
     with col3:
@@ -361,12 +361,12 @@ with tab4:
         ax4.set_ylabel('Frequency', fontsize=12)
         st.pyplot(fig4)
 
-    # Hexbin plot: Price vs Carat
+    # Price vs Carat
     col5, col6 = st.columns(2)
 
     with col5:
         fig5, ax5 = plt.subplots(figsize=(4, 2))
-        hb = ax5.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)  # Hexbin doesn't support single color
+        hb = ax5.hexbin(df['Carat'], df['Price'], gridsize=50, cmap='viridis', mincnt=1)
         cb = plt.colorbar(hb, ax=ax5, label='Count')
         ax5.set_title('Price vs Carat', fontsize=14)
         ax5.set_xlabel('Carat', fontsize=12)
@@ -374,22 +374,22 @@ with tab4:
         st.pyplot(fig5)
 
     with col6:
-        # Feature Importance Visualization
+        # Feature importance visualization
     
         try:
-            # Use the feature columns from the data loaded into the model
+            # Using feature columns from data loaded into the model
             feature_names = df.drop(columns=['Price'], errors='ignore').columns
     
-            # Calculate feature importance from tuned model
+            # Calculating feature importance from tuned model
             feature_importances = tuned_model.get_feature_importance()
     
-            # Create a DataFrame for feature importance
+            # Creating a df for feature importance
             feature_importances_df = pd.DataFrame({
                 'Feature': feature_names,
                 'Importance': feature_importances
             }).sort_values(by='Importance', ascending=False)
     
-            # Plot feature importance
+            # Plotting feature importance
             fig6, ax6 = plt.subplots(figsize=(4, 2))
             sns.barplot(x='Importance', y='Feature', data=feature_importances_df, palette=['#739BD0'], ax=ax6)
             ax6.set_title('Feature Importance', fontsize=14)
@@ -399,4 +399,6 @@ with tab4:
         except Exception as e:
             st.error(f"Failed to load feature importance: {e}")
 
-
+# Thank you!
+            
+# By Clemens Burleson and Aksh Iyer
